@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.reply">
+
+	<!-- 너무 길면 인식 안될수도 있어서 모두 하나의 문자열로 인식되게 하기 위해 <![CDATA[ 내용 ]]> 써줌  -->	
+	<insert id="insert">
+	
+	<![CDATA[
+		insert into tbl_reply(r_num, r_fk_q_num, r_replytext, r_fk_m_id)
+		values (
+		(select NVL2(max(r_num), max(r_num+1), 1) from tbl_reply), #{r_fk_q_num}, #{r_replytext}, #{r_fk_m_id}
+		)
+	]]>
+	</insert>
+	
+	<select id="list" resultType="com.naver.dto.ReplyDTO">
+		select * from tbl_reply where r_fk_q_num = #{r_fk_q_num} order by r_fk_q_num desc
+	</select>
+	
+	<delete id="delete">
+		delete from tbl_reply where r_num = #{r_num}
+	</delete>
+	
+	<delete id="deleteAllreply">
+		delete from tbl_reply where r_fk_q_num = #{r_fk_q_num}
+	</delete>
+	
+	<update id="update">
+		update tbl_reply set r_replytext = #{r_replytext}, r_updatedate = sysdate where r_num = #{r_num}
+	</update>
+	
+<!-- 	<delete id="deleteByBno"> -->
+<!-- 		delete from reply where bno = #{bno} -->
+<!-- 	</delete> -->
+	
+</mapper>

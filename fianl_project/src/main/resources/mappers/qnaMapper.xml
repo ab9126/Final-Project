@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.qna">
+
+	<!-- 페이징 -->
+	<select id="getAmount" resultType="Integer">
+		select count(q_num) from tbl_qna
+	</select>
+
+	<select id="list" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna order by q_reproot desc, q_repstep asc
+	</select>
+	
+	<insert id="insert">
+		<![CDATA[
+ 		insert into tbl_qna values (#{q_num}, #{q_title}, #{q_fk_m_id}, sysdate, #{q_content}, #{q_secret, jdbcType=VARCHAR}, #{q_fk_p_num, jdbcType=VARCHAR}, #{q_reproot}, 0, 0,#{q_thumb, jdbcType=VARCHAR})
+ 		]]> 
+	</insert>
+	
+	<delete id="delete">
+		delete from tbl_qna where q_num = #{q_num}
+	</delete>
+
+	<update id="update">
+		update tbl_qna set q_title = #{q_title} , q_content = #{q_content} where q_num = #{q_num}
+	</update>
+
+<!-- 	<insert id="insert"> -->
+<!-- 		<![CDATA[ -->
+<!-- 		insert into tbl_qna values (#{q_num}, #{q_title}, #{q_fk_m_id}, sysdate, #{q_content}, #{q_secret}, #{q_fk_p_num}, #{q_reproot}, 0, 0,#{q_thumb}) -->
+<!-- 		]]> -->
+<!-- 	</insert> -->
+	
+	<select id="getQnum" resultType="Integer">
+		select nvl2(max (q_num), max(q_num)+1, 1) q_num from tbl_qna
+	</select>
+	
+	<select id="read" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_num = #{q_num}
+	</select>
+	
+	<insert id="reply">
+		insert into tbl_qna values(#{q_num}, #{q_title}, #{q_fk_m_id}, sysdate, #{q_content}, #{q_secret, jdbcType=VARCHAR}, #{q_fk_p_num,jdbcType=VARCHAR}, #{q_reproot}, #{q_repstep}, #{q_indent})
+	</insert>
+	
+	<update id="icreaseRepStep">
+		update tbl_qna set q_repstep = q_repstep + 1 where q_repstep = #{q_repstep} and q_repstep > #{q_repstep}
+	</update>
+	
+	<select id="oridto" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_num = #{q_num}
+	</select>
+	
+	
+<!-- 	일부 사진 삭제 관련 -->
+	<delete id="deleteFile">
+		delete from tbl_qna where q_num = #{q_num} and q_thumb = #{q_thumb}
+	</delete>
+	
+	<!-- 해당 게시글 전체 사진 삭제 관련 -->
+	<delete id="deleteFileAll">
+		delete from tbl_qna where q_num = #{q_num}
+	</delete>
+	
+<!-- 	사진 경로 저장 -->
+	<insert id="addAttach">
+		<![CDATA[
+		insert into tbl_attach(att_id , att_fk_q_num , att_filename)
+		 values((select NVL2(max(att_id), max(att_id) +1, 1) from tbl_attach),
+		 #{att_fk_q_num}, #{att_filename})
+		]]>
+	</insert>
+<!-- 	사진 경로 리스트 -->
+	<select id="getAttach" resultType="string">
+		select att_filename from tbl_attach where att_fk_q_num = #{att_fk_q_num}
+	</select>
+	
+	
+	
+	<select id="selall" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_num like '%'||#{selectoption}||'%' or
+		 q_title like '%'||#{selectoption}||'%' or q_fk_m_id like '%'||#{selectoption}||'%' or q_content like '%'||#{selectoption}||'%' 
+	</select>
+	
+	<select id="seltitle" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_title like '%'||#{selectoption}||'%'
+	</select>
+	
+	<select id="selcontent" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_content like '%'||#{selectoption}||'%'
+	</select>
+	
+	<select id="selmid" resultType="com.naver.dto.QnaDTO">
+		select * from tbl_qna where q_fk_m_id like '%'||#{selectoption}||'%'
+	</select>
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

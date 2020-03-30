@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.cart">
+   
+   
+   <select id="getAmount" resultType="Integer">
+      select count(cart_num) from tbl_cart
+   </select>
+   
+   
+   <insert id="insert">
+   <![CDATA[
+      insert into tbl_cart values (
+      (select NVL2(max (cart_num), max(cart_num)+1, 1) from tbl_cart), 
+      #{m_id}, #{p_num}, 
+      #{cart_cnt}, #{cart_size},#{cart_color}
+      )
+   ]]>
+   </insert>
+   
+   <select id="list" resultType="com.naver.dto.CartsubDTO">
+       select m.m_id, m.m_name, m_point,
+           c.cart_num,c.cart_fk_m_id,c.cart_fk_p_num,c.cart_cnt, c.cart_color,c.cart_size,
+           p.p_num, p.p_price, p.p_thumb , p.p_fk_m_id , p.p_title
+       from tbl_member m
+           inner join tbl_cart c
+           on m.m_id = c.cart_fk_m_id
+           inner join tbl_product p
+           on c.cart_fk_p_num = p.p_num
+           where c.cart_fk_m_id = #{m_id}
+    </select>    
+   
+   
+   <delete id="delete">
+      delete from tbl_cart where cart_num  = #{c_num}
+   </delete>
+   
+   <update id="update">
+         update tbl_cart set cart_cnt = #{cart_cnt} where cart_num = #{cart_num}
+   </update>
+   
+</mapper>

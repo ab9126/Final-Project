@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.review">
+
+	<insert id="insert">
+		<![CDATA[
+		insert into tbl_review values (
+		(select nvl2(max (r_num), max(r_num)+1, 1) from tbl_review), 
+		#{r_fk_p_num}, #{r_content}, #{r_grade}, 
+		sysdate, sysdate, #{r_fk_m_id}, #{r_thumb, jdbcType=VARCHAR})
+		]]>
+		<selectKey keyProperty="r_num" resultType="Integer" order="AFTER">
+			select max(r_num) from tbl_review
+		</selectKey>
+	</insert>
+	
+	<insert id="addAttach">
+		<![CDATA[
+		insert into tbl_attach values(
+		(select NVL2(max(att_id), max(att_id) +1, 1) from tbl_attach), 
+		#{att_fk_r_num}, null, null, #{att_filename})
+		]]>
+	</insert>
+	
+	<select id="list" resultType="com.naver.dto.ReviewDTO">
+		select * from tbl_review where r_fk_p_num = #{p_num} order by r_num desc
+	</select>
+	
+	<select id="getAmount" resultType="Integer">
+		select count(r_num) from tbl_review
+	</select>
+	
+	<select id="getAttach" resultType="string">
+		select att_filename from tbl_attach where att_fk_r_num = #{att_fk_r_num}
+	</select>
+	
+	<delete id="delete">
+		delete from tbl_review where r_num = #{r_num}
+	</delete>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.order">
+
+   <insert id="insert">
+      insert into tbl_order values(
+      (select NVL2(max (o_num), max(o_num)+1, 1) from tbl_order),
+      #{o_fk_p_num}, #{o_fk_m_id}, #{o_memo, jdbcType=VARCHAR}, sysdate, 1,
+      #{o_size}, #{o_color}, #{o_cnt}
+      )
+   </insert>
+   
+   <update id="update">
+      update tbl_order set o_delivery #{o_delivery}
+      where o_num = #{o_num}
+   </update>
+   
+   <select id="list" resultType="com.naver.dto.OrderSubDTO">
+   		select m_id, m_name, m_ph, m_email, p_num, p_title, p_price, p_thumb, o_num,
+   		o_memo, o_regdate, o_delivery, o_size, o_color, o_cnt from tbl_member inner join
+   		tbl_order on m_id = o_fk_m_id inner join tbl_product on p_num = o_fk_p_num
+   		where o_fk_m_id = #{m_id} order by o_num desc
+   </select>
+   
+</mapper>

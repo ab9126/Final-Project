@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.product">
+
+	<insert id="insert">
+		<![CDATA[
+		insert into tbl_product values (
+		(select nvl2(max (p_num), max(p_num)+1, 1) from tbl_product), 
+		#{p_title}, #{p_price}, #{p_info}, sysdate, sysdate, 0, 0, 
+		#{p_thumb}, #{p_catecode}, #{p_fk_m_id})
+		]]>
+		<selectKey keyProperty="p_num" resultType="Integer" order="AFTER">
+			select max(p_num) from tbl_product
+		</selectKey>
+	</insert>
+	
+	<insert id="addAttach">
+		<![CDATA[
+		insert into tbl_attach values(
+		(select NVL2(max(att_id), max(att_id) +1, 1) from tbl_attach), 
+		null, #{att_fk_p_num}, null, #{att_filename})
+		]]>
+	</insert>
+	
+	<insert id="addsize">
+		insert into tbl_size values(
+		(select NVL2(max(size_num), max(size_num) +1, 1) from tbl_size),
+		#{size_fk_p_num}, #{size_name}
+		)
+	</insert>
+	
+	<insert id="addcolor">
+		insert into tbl_color values(
+		(select NVL2(max(color_num), max(color_num) +1, 1) from tbl_color),
+		#{color_fk_p_num}, #{color_name}
+		)
+	</insert>
+	
+	<select id="getsize" resultType="string">
+		select size_name from tbl_size where size_fk_p_num = #{p_num}
+	</select>
+	
+	<select id="getcolor" resultType="string">
+		select color_name from tbl_color where color_fk_p_num = #{p_num}
+	</select>
+	
+	<select id="read" resultType="com.naver.dto.ProductDTO">
+		select * from tbl_product where p_num = #{p_num}
+	</select>
+	
+	<update id="updateReadcnt">
+		update tbl_product set p_readcnt = p_readcnt + 1 where p_num = #{p_num}
+	</update>
+	
+	<select id="getAttach" resultType="string">
+		select att_filename from tbl_attach where att_fk_p_num = #{att_fk_p_num}
+	</select>
+	
+	<delete id="delete">
+		delete from tbl_product where p_num = #{p_num}
+	</delete>
+	
+	<select id="updateui" resultType="com.naver.dto.ProductDTO">
+		select * from tbl_product where p_num = #{p_num}
+	</select>
+
+	<delete id="deleteFile">
+		delete from tbl_attach where att_fk_p_num = #{att_fk_p_num} and att_filename = #{att_filename}
+	</delete>
+
+	<update id="update">
+	<![CDATA[
+		update tbl_product set p_title = #{p_title}, p_price = #{p_price}, 
+		p_info = #{p_info}, p_updatedate = sysdate, p_thumb = #{p_thumb}, 
+		p_catecode = #{p_catecode} where p_num = #{p_num}
+	]]>
+	</update>
+	
+	<delete id="deleteAllFile">
+		delete from tbl_attach where att_fk_p_num = #{p_num}
+	</delete>
+	
+	<select id="list" resultType="com.naver.dto.ProductDTO">
+		select * from tbl_product 
+		<include refid="type"/>
+		order by p_num desc
+	</select>
+
+	<select id="getAmount" resultType="Integer">
+		select count(p_num) from tbl_product
+		<include refid="type"/>
+	</select>
+	
+	<sql id="type">
+		<choose>
+			<when test="p_catecode != null">
+				where p_catecode = #{p_catecode}
+			</when>
+			<when test="search != null">
+				where p_title like '%'||#{search}||'%' 
+				or p_info like '%'||#{search}||'%'
+			</when>
+		</choose>
+	</sql>
+	
+	<select id="hotlist" resultType="com.naver.dto.ProductDTO">
+		select * from tbl_product order by p_readcnt desc
+	</select>
+	
+	
+
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.member">
+	<!-- 회원가입 -->
+	<insert id="insert" parameterType="com.naver.dto.MemberDTO">
+		insert into tbl_member
+		(m_id,m_password,m_name,m_birth,m_email,m_ph,m_gender,m_oaddress,m_address,m_detailaddress,m_point,m_admin)
+		values(
+		#{m_id},
+		#{m_password},
+		#{m_name},
+		#{m_birth},
+		#{m_email},
+		#{m_ph},
+		#{m_gender},
+		#{m_oaddress},
+		#{m_address},
+		#{m_detailaddress},
+		0,
+		#{m_admin}
+		)
+	</insert>
+
+	<select id="list" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member
+	</select>
+
+	<select id="login" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where
+		m_id
+		=
+		#{m_id} and m_password = #{m_password}
+	</select>
+	<!-- 회원정보 수정 -->
+
+	<update id="update">
+		update tbl_member set 
+		m_password = #{m_password},
+		m_email =#{m_email},m_ph = #{m_ph},
+		m_address = #{m_address},
+		m_detailaddress = #{m_detailaddress}
+
+		where m_id = #{m_id}
+	</update>
+
+
+	<delete id="delete">
+		delete tbl_member where m_id = #{m_id} and
+		m_password
+		= #{m_password}
+	</delete>
+	<select id="read" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where m_id
+		= #{m_id}
+	</select>
+	
+	<select id="pwfind" resultType="com.naver.dto.MemberDTO">
+      SELECT * from tbl_member WHERE m_email = #{m_email} and m_id = #{m_id}
+   </select>
+
+
+	<select id="selall" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where m_id like '%'||#{search}||'%' or
+		 m_name like '%'||#{search}||'%' or m_email like '%'||#{search}||'%'
+	</select>
+	
+	<select id="selm_id" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where m_id like '%'||#{search}||'%'
+	</select>
+	
+	<select id="selm_name" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where m_name like '%'||#{search}||'%'
+	</select>
+	
+	<select id="selm_email" resultType="com.naver.dto.MemberDTO">
+		select * from tbl_member where m_email like '%'||#{search}||'%'
+	</select>
+
+</mapper>
+
